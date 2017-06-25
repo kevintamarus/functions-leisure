@@ -1,5 +1,5 @@
 //input => chord(as string) ex: "A", "F#7"
-//output => array of notes in chord
+//output => array of notes of the input chord
 var chordGenerator = function(chord) {
     var notesObject = {
         sharp : ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
@@ -10,10 +10,11 @@ var chordGenerator = function(chord) {
         majorScale : [0,2,4,5,7,9,11],
         minorScale : [0,2,3,5,7,8,10],
     }
+    var chordCheck = {};
     var notes = [];
     var scale = [];
-    var chordCheck = {};
     var chordNotes = [];
+    //puts all letters and symbols into an object for checking/referencing
     for(var i=0; i<chord.length; i++) {
         chordCheck[chord[i]] = chord[i];
     }
@@ -52,10 +53,11 @@ var chordGenerator = function(chord) {
     }
     //regular
     //need to figure a way to convert 7th to minor 7th
+    //DO NOT put 'else' into this else statement
     else {
         console.log('regular');
     }
     return chordNotes;
 }
 
-console.log( chordGenerator("C#maj7") );
+console.log( chordGenerator("C#") );
