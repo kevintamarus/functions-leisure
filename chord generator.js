@@ -1,3 +1,8 @@
+/*
+1)Augmented/Diminished need to be fixed to # or b notes, respectively???
+2)numbers at the end need to be matched with note and pushed to chordNotes array
+*/
+
 //input => chord(as string) ex: "A", "F#7"
 //output => array of notes of the input chord
 var chordGenerator = function(chord) {
@@ -18,14 +23,24 @@ var chordGenerator = function(chord) {
     for(var i=0; i<chord.length; i++) {
         chordCheck[chord[i]] = chord[i];
     }
-    //set root note at array[0]
+    //check if chord is minor or major
+    var isMinor = '';
+    (chordCheck.m && !chordCheck.j && !chordCheck.i) ? isMinor = 'yes' : isMinor = 'no';
+    //set root note at chordNotes[0]
     (chord[1] === '#' || chord[1] === 'b') ? chordNotes.push(chord.slice(0,2)) : chordNotes.push(chord[0]);
     //set notes array to # or b
-    (chord[1] === 'b' || chord[0] === 'F') ? notes = notesObject.flat : notes = notesObject.sharp;
+    //if it's minor
+    if(isMinor === 'yes') {
+        (chord[1]==='#' || chordNotes[0]==='E' || chordNotes[0]==='B') ? notes = notesObject.sharp : notes = notesObject.flat;
+    }
+    //if it's major
+    else {
+        (chord[1] === 'b' || chordNotes[0] === 'F') ? notes = notesObject.flat : notes = notesObject.sharp;
+    }
     //adjust notes starting at root note
     notes = notes.slice(indexRange[chordNotes[0]],notes.length).concat(notes.slice(0,indexRange[chordNotes[0]]));
-    //check major/minor and add to scale array, j checks for maj, i checks for diminished
-    (chordCheck.m && !chordCheck.j && !chordCheck.i) ? indexRange.minorScale.forEach(function(x) {
+    //check major/minor and add to scale array
+    (isMinor === 'yes') ? indexRange.minorScale.forEach(function(x) {
         scale.push(notes[x]);
     }) : indexRange.majorScale.forEach(function(x) {
         scale.push(notes[x]);
@@ -37,15 +52,16 @@ var chordGenerator = function(chord) {
     }
     //sus - passed
     else if (chordCheck.s) {
-        chordNotes[1] = scale[3];
+        chordNotes[1] = notes[11];
     }
-    //augmented
+    //augmented - passed
     else if(chordCheck.u) {
-        console.log('augmented');
+        chordNotes[2] = notes[8];
     }
-    //diminished
+    //diminished - passed
     else if(chordCheck.i) {
-        console.log('diminished');
+        chordNotes[1] = notes[3];
+        chordNotes[2] = notes[6];
     }
     //flat/sharp extras
     else if(chord[chord.length-2] === "#" || chord[chord.length-2] === "b") {
@@ -57,7 +73,8 @@ var chordGenerator = function(chord) {
     else {
         console.log('regular');
     }
+    console.log(notes)
     return chordNotes;
 }
 
-console.log( chordGenerator("C#") );
+console.log( chordGenerator("Caug") );
