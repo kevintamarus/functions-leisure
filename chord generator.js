@@ -1,6 +1,6 @@
 /*
-1)Augmented/Diminished need to be fixed to # or b notes, respectively???
-2)numbers at the end need to be matched with note and pushed to chordNotes array
+-There are 73 different chord versions, not all can be checked yet
+-some notation(like C7, 7th note should give Bb but it's A# instead) needs to be adjusted
 */
 
 //input => chord(as string) ex: "A", "F#7"
@@ -10,22 +10,22 @@ var chordGenerator = function(chord) {
         sharp : ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
         flat : ["A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"]
     }
-    var indexRange = {
+    var index = {
         A:0,Bb:1,'A#':1,B:2,C:3,Db:4,'C#':4,D:5,Eb:6,'D#':6,E:7,F:8,Gb:9,'F#':9,G:10,Ab:11,'G#':11,
+        "9":2,"11":5,"7":10,//last number index reference
         majorScale : [0,2,4,5,7,9,11],
         minorScale : [0,2,3,5,7,8,10],
     }
-    var chordCheck = {};
+    var stringCheck = {};
     var notes = [];
-    var scale = [];
     var chordNotes = [];
     //puts all letters and symbols into an object for checking/referencing
     for(var i=0; i<chord.length; i++) {
-        chordCheck[chord[i]] = chord[i];
+        stringCheck[chord[i]] = chord[i];
     }
     //check if chord is minor or major
     var isMinor = '';
-    (chordCheck.m && !chordCheck.j && !chordCheck.i) ? isMinor = 'yes' : isMinor = 'no';
+    (stringCheck.m && !stringCheck.j) ? isMinor = 'yes' : isMinor = 'no';
     //set root note at chordNotes[0]
     (chord[1] === '#' || chord[1] === 'b') ? chordNotes.push(chord.slice(0,2)) : chordNotes.push(chord[0]);
     //set notes array to # or b
@@ -38,43 +38,32 @@ var chordGenerator = function(chord) {
         (chord[1] === 'b' || chordNotes[0] === 'F') ? notes = notesObject.flat : notes = notesObject.sharp;
     }
     //adjust notes starting at root note
-    notes = notes.slice(indexRange[chordNotes[0]],notes.length).concat(notes.slice(0,indexRange[chordNotes[0]]));
-    //check major/minor and add to scale array
-    (isMinor === 'yes') ? indexRange.minorScale.forEach(function(x) {
-        scale.push(notes[x]);
-    }) : indexRange.majorScale.forEach(function(x) {
-        scale.push(notes[x]);
-    }) ;
-    chordNotes.push(scale[2], scale[4]);
+    notes = notes.slice(index[chordNotes[0]],notes.length).concat(notes.slice(0,index[chordNotes[0]]));
+    //pushing the 3rd and 5th notes into chordNotes
+    (isMinor === 'yes') ? chordNotes.push(notes[3], notes[7]) : chordNotes.push(notes[4], notes[7]) ;
     //major7 - passed
-    if (chordCheck.j) {
-        chordNotes.push(scale[6]);
+    if (stringCheck.j) {
+        chordNotes.push(notes[11]);
     }
     //sus - passed
-    else if (chordCheck.s) {
-        chordNotes[1] = notes[11];
+    else if (stringCheck.s) {
+        chordNotes[1] = notes[5];
     }
     //augmented - passed
-    else if(chordCheck.u) {
+    else if(stringCheck.u) {
         chordNotes[2] = notes[8];
     }
     //diminished - passed
-    else if(chordCheck.i) {
+    else if(stringCheck.i) {
         chordNotes[1] = notes[3];
         chordNotes[2] = notes[6];
     }
-    //flat/sharp extras
-    else if(chord[chord.length-2] === "#" || chord[chord.length-2] === "b") {
-        console.log('flat/sharp extra')
+    //if last chord index is in stringCheck, if it's not a number it will check Nan which is not in stringCheck
+    else if(index[Number(chord[chord.length-1])]) {
+        chordNotes.push(notes[index[chord[chord.length-1]]]);
     }
-    //regular
-    //need to figure a way to convert 7th to minor 7th
-    //DO NOT put 'else' into this else statement
-    else {
-        console.log('regular');
-    }
-    console.log(notes)
     return chordNotes;
 }
 
-console.log( chordGenerator("Caug") );
+//example console.log
+console.log( chordGenerator("Bbm7") );
